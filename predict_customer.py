@@ -251,10 +251,4 @@ def predict_customer_page(model):
             st.success(
                 f"✅ **Priority Level: Low**\n\n**Recommended Action:** {retention_action}"
             )
-        # st.metric("Churn Probability", f"{probability:.2%}")
-        # st.metric("Customer Lifetime Value", f"${clv:.2f}")
-        # st.metric("Revenue At Risk", f"${revenue:.2f}")
-        # st.metric("Priority Score", f"{priority:.2f}")
-        # st.metric("Priority Level", priority_level(priority))
-
-        # st.info(retention_action)
+       

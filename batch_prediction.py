@@ -38,7 +38,9 @@ def batch_prediction_page(model):
         df["AverageMonthlySpend"] = df["TotalCharges"] / (df["tenure"] + 1)
 
         df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
+
         df = pd.get_dummies(df, drop_first=True, dtype=int)
+
         X = df.drop(columns=["Churn"], errors="ignore")
         # -----------------------------
         # Prediction
