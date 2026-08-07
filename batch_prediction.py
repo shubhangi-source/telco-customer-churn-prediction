@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from src.utils import (
+from utils import (
     calculate_clv,
     calculate_revenue_at_risk,
     calculate_priority_score,

@@ -3,20 +3,20 @@ import streamlit as st
 # -----------------------------
 # Import Configuration
 # -----------------------------
-from src.config import set_page_config, APP_TITLE, APP_DESCRIPTION
+from config import set_page_config, APP_TITLE, APP_DESCRIPTION
 
 # -----------------------------
 # Import Model Loader
 # -----------------------------
-from src.load_model import load_model
+from load_model import load_model
 
 # -----------------------------
 # Import Pages
 # -----------------------------
-from src.dashboard import show_dashboard
-from src.predict_customer import predict_customer_page
-from src.batch_prediction import batch_prediction_page
-from src.shap_explain import shap_page
+from dashboard import show_dashboard
+from predict_customer import predict_customer_page
+from batch_prediction import batch_prediction_page
+from shap_explain import shap_page
 
 # -----------------------------
 # Configure Streamlit Page
