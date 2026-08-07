@@ -15,7 +15,7 @@ from load_model import load_model
 # -----------------------------
 from dashboard import show_dashboard
 from predict_customer import predict_customer_page
-from batch_prediction import batch_prediction_page
+from src.batch_prediction import batch_prediction_page
 from shap_explain import shap_page
 
 # -----------------------------
