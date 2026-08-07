@@ -48,7 +48,7 @@ def show_dashboard():
         df,
         names="predicted_churn",
         color="predicted_churn",
-        color_discrete_map={0: "#22C55E", 1: "#EF4444"},
+        color_discrete_map={0: "#34D399", 1: "#F87171"},
         hole=0.4,
         title="Predicted Churn Distribution",
     )
@@ -66,11 +66,7 @@ def show_dashboard():
 
     st.subheader("Customer Priority Levels")
 
-    color_map = {
-        "High": "#EF4444",  # Red
-        "Medium": "#F59E0B",  # Orange
-        "Low": "#22C55E",  # Green
-    }
+    color_map = {"High": "#F87171", "Medium": "#FBBF24", "Low": "#34D399"}
     priority_fig = px.bar(
         df["Priority_Level"].value_counts().reset_index(),
         x="Priority_Level",
@@ -96,7 +92,7 @@ def show_dashboard():
         df,
         x="Revenue_At_Risk",
         nbins=30,
-        color_discrete_sequence=["#F97316"],
+        color_discrete_sequence=["#818CF8"],
         title="Revenue At Risk Distribution",
     )
 
