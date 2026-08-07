@@ -8,7 +8,7 @@ def show_dashboard():
     st.title("📊 Business Dashboard")
 
     # Load data
-    df = pd.read_csv("data/03_results/revenue_loss_estimator.csv")
+    df = pd.read_csv("data/revenue_loss_estimator.csv")
 
     # ------------------------------
     # KPI Cards
