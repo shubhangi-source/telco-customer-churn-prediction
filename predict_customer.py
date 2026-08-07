@@ -7,6 +7,7 @@ from utils import (
     calculate_priority_score,
     priority_level,
     smart_retention,
+    recommendation_reason,
     calculate_average_monthly_spend,
 )
 
@@ -207,15 +208,23 @@ def predict_customer_page(model):
 
         level_name = priority_level(priority)
 
-        customer_data = {
-            "Priority_Level": level_name,  # e.g., "Critical", "High", "Medium", "Low"
-            "CLV": clv,
-            "tenure": tenure,
-            "MonthlyCharges": monthly,
-        }
+        customer_data = customer.copy()
+
+        customer_data.update(
+            {
+                "Churn_Probability": probability,
+                "Priority_Level": level_name,
+                "CLV": clv,
+                "tenure": tenure,
+                "MonthlyCharges": monthly,
+            }
+        )
 
         # Get recommended action
         retention_action = smart_retention(customer_data)
+
+        # Get recommedation_reason
+        reason = recommendation_reason(customer_data)
         st.success("Prediction Completed")
 
         if prediction == 1:
@@ -237,18 +246,28 @@ def predict_customer_page(model):
         # Dynamic retention strategy UI based on priority level
         if level_name == "Critical":
             st.error(
-                f"🚨 **Priority Level: Critical**\n\n**Recommended Action:** {retention_action}"
+                f"🚨 **Priority Level: Critical**\n\n"
+                f"**Recommended Action:** {retention_action}\n\n"
+                f"**Recommendation Reason:** {reason}"
             )
+
         elif level_name == "High":
             st.warning(
-                f"⚠️ **Priority Level: High**\n\n**Recommended Action:** {retention_action}"
+                f"⚠️ **Priority Level: High**\n\n"
+                f"**Recommended Action:** {retention_action}\n\n"
+                f"**Recommendation Reason:** {reason}"
             )
+
         elif level_name == "Medium":
             st.info(
-                f"ℹ️ **Priority Level: Medium**\n\n**Recommended Action:** {retention_action}"
+                f"ℹ️ **Priority Level: Medium**\n\n"
+                f"**Recommended Action:** {retention_action}\n\n"
+                f"**Recommendation Reason:** {reason}"
             )
+
         else:
             st.success(
-                f"✅ **Priority Level: Low**\n\n**Recommended Action:** {retention_action}"
+                f"✅ **Priority Level: Low**\n\n"
+                f"**Recommended Action:** {retention_action}\n\n"
+                f"**Recommendation Reason:** {reason}"
             )
-       

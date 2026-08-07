@@ -84,6 +84,8 @@ if page == "🏠 Home":
 
         ✅ Smart Retention Recommendation
 
+        ✅ Recommedation Reason
+
         ✅ Batch Prediction
 
         ✅ SHAP Explainability
@@ -144,6 +146,7 @@ and provides business insights to help companies reduce customer attrition.
 - Priority Score
 - Priority Level
 - Smart Retention Recommendation
+- Recommendation Reason
 - SHAP Explainability
 - Batch Prediction
 

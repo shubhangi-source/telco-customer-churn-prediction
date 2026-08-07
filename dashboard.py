@@ -119,6 +119,7 @@ def show_dashboard():
                 "Priority_Level",
                 "Revenue_At_Risk",
                 "Retention_Action",
+                "Recommendation_Reason",
             ]
         ],
         use_container_width=True,

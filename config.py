@@ -27,7 +27,11 @@ and provides business insights ."""
 
 MODEL_NAME = "Logistic Regression Classifier"
 
-MODEL_ACCURACY = " 75.25%"
+MODEL__ACCURACY = " 74.3%"
+
+MODEL_RECALL = "78.6%"
+
+MODEL_ROC_AUC = 0.845
 
 DATASET_NAME = "Telco Customer Churn Dataset"
 

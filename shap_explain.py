@@ -24,6 +24,7 @@ def shap_page(best_lr):
         "Priority_Score",
         "Priority_Level",
         "Retention_Action",
+        "Recommendation_Reason",
         "Revenue_At_Risk",
     ]
 

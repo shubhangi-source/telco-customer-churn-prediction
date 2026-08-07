@@ -7,6 +7,7 @@ from utils import (
     calculate_priority_score,
     priority_level,
     smart_retention,
+    recommendation_reason,
 )
 
 
@@ -93,6 +94,10 @@ def batch_prediction_page(model):
 
         df["Retention_Action"] = df.apply(smart_retention, axis=1)
 
+        # -----------------------------
+        # Recommedation Reason
+        # -----------------------------
+        df["Recommendation_Reason"] = df.apply(recommendation_reason, axis=1)
         # -----------------------------
         # Results
         # -----------------------------
