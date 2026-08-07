@@ -14,7 +14,7 @@ def shap_page(best_lr):
     # Load Dataset
     # -----------------------------
 
-    df = pd.read_csv("data/revenue_loss_estimator.csv")
+    df = pd.read_csv("data/03_results/revenue_loss_estimator.csv")
 
     # Remove columns not used for prediction
     drop_cols = [
