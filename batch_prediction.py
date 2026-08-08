@@ -78,6 +78,15 @@ def batch_prediction_page(model):
         # Priority Score
         # -----------------------------
 
+        max_clv = df["CLV"].max()
+
+        df["Priority_Score"] = df.apply(
+            lambda row: calculate_priority_score(
+                row["CLV"], row["Churn_Probability"], max_clv
+            ),
+            axis=1,
+        )
+
         df["Priority_Score"] = df.apply(
             lambda x: calculate_priority_score(x["CLV"], x["Churn_Probability"]), axis=1
         )

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def load_data():
@@ -39,7 +40,7 @@ def calculate_priority_score(clv, probability, max_clv=8550):
     """
     Priority Score
     """
-    clv_scaled = min(clv / max_clv, 1.0)
+    clv_scaled = np.clip(clv / max_clv, 0, 1)
     priority_score = ((probability * 0.7) + (clv_scaled * 0.3)) * 100
     return round(priority_score, 2)
 

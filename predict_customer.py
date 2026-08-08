@@ -47,8 +47,6 @@ def predict_customer_page(model):
 
         internet = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
 
-    with col2:
-
         online_security = st.selectbox(
             "Online Security", ["No", "Yes", "No internet service"]
         )
@@ -56,6 +54,7 @@ def predict_customer_page(model):
         online_backup = st.selectbox(
             "Online Backup", ["No", "Yes", "No internet service"]
         )
+    with col2:
 
         device_protection = st.selectbox(
             "Device Protection", ["No", "Yes", "No internet service"]
