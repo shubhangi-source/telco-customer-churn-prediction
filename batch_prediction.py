@@ -21,109 +21,117 @@ def batch_prediction_page(model):
 
     if uploaded_file is not None:
 
+        # --------------------------------
+        # Load Data
+        # --------------------------------
+
         df = pd.read_csv(uploaded_file)
 
         st.subheader("Uploaded Data")
+        st.dataframe(df.head(), use_container_width=True)
 
-        st.dataframe(df.head())
-
-        # -----------------------------
+        # --------------------------------
         # Feature Engineering
-        # -----------------------------
+        # --------------------------------
+
         df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-
-        df["TotalCharges"].fillna(df["TotalCharges"].median(), inplace=True)
-
-        df.drop("customerID", axis=1, inplace=True)
 
         df["AverageMonthlySpend"] = df["TotalCharges"] / (df["tenure"] + 1)
 
         df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
 
-        df = pd.get_dummies(df, drop_first=True, dtype=int)
+        # --------------------------------
+        # Prepare data for model
+        # --------------------------------
 
-        X = df.drop(columns=["Churn"], errors="ignore")
+        X = df.drop(columns=["customerID", "Churn"], errors="ignore")
 
-        X.fillna(X.median(), inplace=True)
-        # -----------------------------
+        # IMPORTANT:
+        # No pd.get_dummies()
+        # No manual scaling
+        # ColumnTransformer Pipeline handles it.
+
+        # --------------------------------
         # Prediction
-        # -----------------------------
+        # --------------------------------
 
         prediction = model.predict(X)
 
         probability = model.predict_proba(X)[:, 1]
 
-        df["predicted_churn"] = prediction
+        # --------------------------------
+        # Keep Original Data
+        # --------------------------------
 
-        df["Churn_Probability"] = probability
+        original_df = df.copy()
+        # --------------------------------
+        # Add prediction results
+        # --------------------------------
 
-        # -----------------------------
+        original_df["predicted_churn"] = prediction
+
+        original_df["Churn_Probability"] = probability
+
+        # --------------------------------
         # CLV
-        # -----------------------------
+        # --------------------------------
 
-        df["CLV"] = df.apply(
-            lambda x: calculate_clv(x["MonthlyCharges"], x["tenure"]), axis=1
-        )
+        original_df["CLV"] = original_df["MonthlyCharges"] * original_df["tenure"]
 
-        # -----------------------------
+        # --------------------------------
         # Revenue At Risk
-        # -----------------------------
+        # --------------------------------
 
-        df["Revenue_At_Risk"] = df.apply(
-            lambda x: calculate_revenue_at_risk(
-                x["MonthlyCharges"], x["Churn_Probability"]
-            ),
-            axis=1,
+        original_df["Revenue_At_Risk"] = (
+            original_df["MonthlyCharges"] * original_df["Churn_Probability"]
         )
 
-        # -----------------------------
+        # --------------------------------
         # Priority Score
-        # -----------------------------
+        # --------------------------------
 
-        max_clv = df["CLV"].max()
-
-        df["Priority_Score"] = df.apply(
-            lambda row: calculate_priority_score(
-                row["CLV"], row["Churn_Probability"], max_clv
-            ),
+        original_df["Priority_Score"] = original_df.apply(
+            lambda row: calculate_priority_score(row["CLV"], row["Churn_Probability"]),
             axis=1,
         )
 
-        df["Priority_Score"] = df.apply(
-            lambda x: calculate_priority_score(x["CLV"], x["Churn_Probability"]), axis=1
+        # --------------------------------
+        # Priority Level
+        # --------------------------------
+
+        original_df["Priority_Level"] = original_df["Priority_Score"].apply(
+            priority_level
         )
 
-        # -----------------------------
-        # Priority Level
-        # -----------------------------
-
-        df["Priority_Level"] = df["Priority_Score"].apply(priority_level)
-
-        # -----------------------------
+        # --------------------------------
         # Retention Recommendation
-        # -----------------------------
+        # --------------------------------
 
-        df["Retention_Action"] = df.apply(smart_retention, axis=1)
+        original_df["Retention_Action"] = original_df.apply(smart_retention, axis=1)
 
-        # -----------------------------
-        # Recommedation Reason
-        # -----------------------------
-        df["Recommendation_Reason"] = df.apply(recommendation_reason, axis=1)
-        # -----------------------------
+        # --------------------------------
+        # Recommendation Reason
+        # --------------------------------
+
+        original_df["Recommendation_Reason"] = original_df.apply(
+            recommendation_reason, axis=1
+        )
+
+        # --------------------------------
         # Results
-        # -----------------------------
+        # --------------------------------
 
         st.success("Prediction Completed Successfully")
 
         st.subheader("Prediction Results")
 
-        st.dataframe(df)
+        st.dataframe(original_df, use_container_width=True)
 
-        # -----------------------------
-        # Download Button
-        # -----------------------------
+        # --------------------------------
+        # Download
+        # --------------------------------
 
-        csv = df.to_csv(index=False).encode("utf-8")
+        csv = original_df.to_csv(index=False).encode("utf-8")
 
         st.download_button(
             label="⬇ Download Prediction Results",

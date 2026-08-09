@@ -3,102 +3,116 @@ import pandas as pd
 import shap
 import matplotlib.pyplot as plt
 
+from sklearn.model_selection import train_test_split
 
-def shap_page(best_lr):
+
+def shap_page(model):
 
     st.title("📈 SHAP Explainability")
 
-    st.write("Understand how the machine learning model makes predictions.")
+    st.write("Understand how the model makes predictions.")
 
     # -----------------------------
-    # Load Dataset
+    # 1. Load Data
     # -----------------------------
 
     df = pd.read_csv("data/revenue_loss_estimator.csv")
 
-    # Remove columns not used for prediction
-    drop_cols = [
-        "predicted_churn",
-        "Churn_Probability",
-        "CLV",
-        "Priority_Score",
-        "Priority_Level",
-        "Retention_Action",
-        "Recommendation_Reason",
-        "Revenue_At_Risk",
-    ]
+    # -----------------------------
+    # 2. Prepare Data
+    # -----------------------------
 
-    df = df.drop(columns=drop_cols, errors="ignore")
-    from sklearn.model_selection import train_test_split
+    df = df.drop(
+        columns=[
+            "predicted_churn",
+            "Churn_Probability",
+            "CLV",
+            "Priority_Score",
+            "Priority_Level",
+            "Retention_Action",
+            "Recommendation_Reason",
+            "Revenue_At_Risk",
+            "customerID",
+        ],
+        errors="ignore",
+    )
 
     X = df.drop("Churn", axis=1)
+
     y = df["Churn"]
+
+    # Convert Yes/No to 0/1
+    if y.dtype == "object":
+        y = y.map({"No": 0, "Yes": 1})
+
+    # -----------------------------
+    # 3. Train Test Split
+    # -----------------------------
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    logistic_model = best_lr.named_steps["model"]
-
-    scaler = best_lr.named_steps["scaler"]
-
-    X_train_scaled = scaler.transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-
-    scaler = best_lr.named_steps["scaler"]
-
     # -----------------------------
-    # SHAP Explainer
+    # 4. Get Preprocessor
     # -----------------------------
 
-    explainer = shap.LinearExplainer(logistic_model, X_train_scaled)
+    preprocessor = model.named_steps["preprocessor"]
 
-    shap_values = explainer.shap_values(X_test_scaled)
+    logistic_model = model.named_steps["model"]
 
     # -----------------------------
-    # Summary Plot
+    # 5. Transform Data
     # -----------------------------
 
-    st.subheader("Feature Importance")
+    X_train = preprocessor.transform(X_train)
 
-    fig = plt.figure(figsize=(8, 4))
+    X_test = preprocessor.transform(X_test)
 
-    shap.summary_plot(
-        shap_values, X_test_scaled, feature_names=X_test.columns, show=False
+    # Get feature names
+    feature_names = preprocessor.get_feature_names_out()
+
+    # -----------------------------
+    # 6. SHAP
+    # -----------------------------
+
+    explainer = shap.LinearExplainer(logistic_model, X_train)
+
+    shap_values = explainer.shap_values(X_test)
+
+    # -----------------------------
+    # 7. Feature Importance
+    # -----------------------------
+
+    st.subheader("📊 Feature Importance")
+
+    shap.summary_plot(shap_values, X_test, feature_names=feature_names, show=False)
+
+    st.pyplot(plt.gcf(), clear_figure=True)
+
+    # -----------------------------
+    # 8. Individual Customer
+    # -----------------------------
+
+    st.subheader("🔍 Individual Customer")
+
+    index = st.number_input(
+        "Customer Index", min_value=0, max_value=len(X_test) - 1, value=0
     )
 
-    st.pyplot(fig)
-
-    plt.clf()
+    index = int(index)
 
     # -----------------------------
-    # Bar Plot
+    # 9. Waterfall Plot
     # -----------------------------
 
-    # -----------------------------
-    # Individual Prediction
-    # -----------------------------
-
-    st.subheader("Explain Individual Customer")
-
-    customer_index = st.number_input(
-        "Customer Index", min_value=0, max_value=len(X_test_scaled) - 1, value=0
+    explanation = shap.Explanation(
+        values=shap_values[index],
+        base_values=explainer.expected_value,
+        data=X_test[index],
+        feature_names=feature_names,
     )
 
-    customer_index = int(customer_index)
+    shap.waterfall_plot(explanation, show=False)
 
-    fig = plt.figure(figsize=(8, 4))
-
-    shap.waterfall_plot(
-        shap.Explanation(
-            values=shap_values[customer_index],
-            base_values=explainer.expected_value,
-            data=X_test_scaled.iloc[customer_index],
-            feature_names=X_test.columns,
-        ),
-        show=False,
-    )
-
-    st.pyplot(fig)
-
-    plt.clf()
+    st.pyplot(plt.gcf(), clear_figure=True)

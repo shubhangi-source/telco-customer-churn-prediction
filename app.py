@@ -137,7 +137,17 @@ elif page == "ℹ️ About":
 This application predicts customer churn using a Machine Learning model
 and provides business insights to help companies reduce customer attrition.
 
-### Features
+### Machine Learning 
+   - Logistic Regression
+   - ColumnTransformer 
+  - OneHotEncoder
+  - RobustScaler
+ - SMOTE
+  - Stratified Cross-Validation 
+ - GridSearchCV
+
+
+###  Business Features
 
 - Customer Churn Prediction
 - Churn Probability
@@ -147,8 +157,11 @@ and provides business insights to help companies reduce customer attrition.
 - Priority Level
 - Smart Retention Recommendation
 - Recommendation Reason
-- SHAP Explainability
 - Batch Prediction
+
+### Explainability
+
+ - SHAP
 
 ### Technologies Used
 

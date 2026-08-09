@@ -64,9 +64,9 @@ def smart_retention(row):
     monthly = row["MonthlyCharges"]
     churn = row["Churn_Probability"]
 
-    # ===========================
-    # CRITICAL PRIORITY
-    # ===========================
+    # =========================
+    # CRITICAL
+    # =========================
 
     if priority == "Critical":
 
@@ -78,36 +78,36 @@ def smart_retention(row):
         elif tenure < 6:
             return "Free 3-Month Subscription + Personal Onboarding"
 
-        elif row["Contract_One year"] == 0 and row["Contract_Two year"] == 0:
+        elif row["Contract"] == "Month-to-month":
             return "Offer Free Upgrade to One-Year Contract"
 
         elif monthly >= 100:
             return "25% Discount + Premium Support"
 
-        elif row["OnlineSecurity_Yes"] == 0 and row["TechSupport_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No" and row["TechSupport"] == "No":
             return "Free Online Security & Tech Support for 6 Months"
 
-        elif row["OnlineSecurity_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No":
             return "Free Online Security for 6 Months"
 
-        elif row["TechSupport_Yes"] == 0:
+        elif row["TechSupport"] == "No":
             return "Free Technical Support for 6 Months"
 
-        elif row["OnlineBackup_Yes"] == 0:
+        elif row["OnlineBackup"] == "No":
             return "Free Cloud Backup for 3 Months"
 
-        elif row["InternetService_Fiber optic"] == 1:
+        elif row["InternetService"] == "Fiber optic":
             return "Free Speed Upgrade + Premium Support"
 
-        elif row["PaymentMethod_Electronic check"] == 1:
+        elif row["PaymentMethod"] == "Electronic check":
             return "Switch to Auto-Pay and Get ₹500 Cashback"
 
         else:
             return "20% Loyalty Discount"
 
-        # ===========================
-        # HIGH PRIORITY
-        # ===========================
+    # =========================
+    # HIGH
+    # =========================
 
     elif priority == "High":
 
@@ -120,22 +120,22 @@ def smart_retention(row):
         elif monthly >= 100:
             return "25% Discount"
 
-        elif row["Contract_One year"] == 0 and row["Contract_Two year"] == 0:
+        elif row["Contract"] == "Month-to-month":
             return "Offer One-Year Contract with Discount"
 
-        elif row["InternetService_Fiber optic"] == 1:
+        elif row["InternetService"] == "Fiber optic":
             return "Free Speed Upgrade"
 
-        elif row["OnlineSecurity_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No":
             return "Free Online Security Trial"
 
-        elif row["TechSupport_Yes"] == 0:
+        elif row["TechSupport"] == "No":
             return "Free Technical Support Trial"
 
-        elif row["OnlineBackup_Yes"] == 0:
+        elif row["OnlineBackup"] == "No":
             return "Free Cloud Backup Trial"
 
-        elif row["PaymentMethod_Electronic check"] == 1:
+        elif row["PaymentMethod"] == "Electronic check":
             return "Auto-Pay Cashback Offer"
 
         elif row["SeniorCitizen"] == 1:
@@ -144,9 +144,9 @@ def smart_retention(row):
         else:
             return "15% Discount + Loyalty Points"
 
-        # ===========================
-        # MEDIUM PRIORITY
-        # ===========================
+    # =========================
+    # MEDIUM
+    # =========================
 
     elif priority == "Medium":
 
@@ -156,19 +156,19 @@ def smart_retention(row):
         elif monthly >= 90:
             return "10% Discount on Monthly Bill"
 
-        elif row["Contract_One year"] == 0 and row["Contract_Two year"] == 0:
+        elif row["Contract"] == "Month-to-month":
             return "Recommend Annual Contract"
 
-        elif row["OnlineSecurity_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No":
             return "Free Online Security Trial"
 
-        elif row["TechSupport_Yes"] == 0:
+        elif row["TechSupport"] == "No":
             return "Free Technical Support Trial"
 
-        elif row["OnlineBackup_Yes"] == 0:
+        elif row["OnlineBackup"] == "No":
             return "Free Cloud Backup Trial"
 
-        elif row["PaymentMethod_Electronic check"] == 1:
+        elif row["PaymentMethod"] == "Electronic check":
             return "Recommend Auto-Pay"
 
         elif row["SeniorCitizen"] == 1:
@@ -177,9 +177,9 @@ def smart_retention(row):
         else:
             return "Personalized Marketing Email"
 
-        # ===========================
-        # LOW PRIORITY
-        # ===========================
+    # =========================
+    # LOW
+    # =========================
 
     else:
 
@@ -189,13 +189,13 @@ def smart_retention(row):
         elif tenure >= 60:
             return "Anniversary Reward Coupon"
 
-        elif row["Contract_Two year"] == 1:
+        elif row["Contract"] == "Two year":
             return "Early Renewal Bonus"
 
-        elif row["InternetService_Fiber optic"] == 1:
+        elif row["InternetService"] == "Fiber optic":
             return "Free Streaming Service Trial"
 
-        elif row["PaymentMethod_Credit card (automatic)"] == 1:
+        elif row["PaymentMethod"] == "Credit card (automatic)":
             return "Cashback Reward"
 
         else:
@@ -210,9 +210,9 @@ def recommendation_reason(row):
     monthly = row["MonthlyCharges"]
     churn = row["Churn_Probability"]
 
-    # ===========================
-    # CRITICAL PRIORITY
-    # ===========================
+    # =========================
+    # CRITICAL
+    # =========================
 
     if priority == "Critical":
 
@@ -224,36 +224,40 @@ def recommendation_reason(row):
         elif tenure < 6:
             return "Customer is new and has a high risk of churn."
 
-        elif row["Contract_One year"] == 0 and row["Contract_Two year"] == 0:
-            return "Customer is on a month-to-month contract, which has a higher churn risk."
+        elif row["Contract"] == "Month-to-month":
+            return (
+                "Customer is on a month-to-month contract, which has higher churn risk."
+            )
 
         elif monthly >= 100:
-            return "Customer pays a high monthly bill, increasing churn risk."
+            return "Customer has high monthly charges."
 
-        elif row["OnlineSecurity_Yes"] == 0 and row["TechSupport_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No" and row["TechSupport"] == "No":
             return "Customer is not subscribed to Online Security and Tech Support."
 
-        elif row["OnlineSecurity_Yes"] == 0:
-            return "Customer is not using the Online Security service."
+        elif row["OnlineSecurity"] == "No":
+            return "Customer is not using Online Security."
 
-        elif row["TechSupport_Yes"] == 0:
-            return "Customer is not using the Technical Support service."
+        elif row["TechSupport"] == "No":
+            return "Customer is not using Technical Support."
 
-        elif row["OnlineBackup_Yes"] == 0:
-            return "Customer is not using the Online Backup service."
+        elif row["OnlineBackup"] == "No":
+            return "Customer is not using Online Backup."
 
-        elif row["InternetService_Fiber optic"] == 1:
-            return "Fiber optic customers have shown higher churn behaviour."
+        elif row["InternetService"] == "Fiber optic":
+            return "Customer uses Fiber optic internet, which showed higher churn behaviour in the dataset."
 
-        elif row["PaymentMethod_Electronic check"] == 1:
-            return "Electronic Check payment customers have relatively higher churn."
+        elif row["PaymentMethod"] == "Electronic check":
+            return (
+                "Customer uses Electronic Check, which showed relatively higher churn."
+            )
 
         else:
-            return "Critical customer identified for immediate retention."
+            return "Customer has been identified as a critical retention case."
 
-    # ===========================
-    # HIGH PRIORITY
-    # ===========================
+    # =========================
+    # HIGH
+    # =========================
 
     elif priority == "High":
 
@@ -266,33 +270,33 @@ def recommendation_reason(row):
         elif monthly >= 100:
             return "Customer has high monthly charges."
 
-        elif row["Contract_One year"] == 0 and row["Contract_Two year"] == 0:
-            return "Customer is on a month-to-month contract."
+        elif row["Contract"] == "Month-to-month":
+            return "Customer is using a month-to-month contract."
 
-        elif row["InternetService_Fiber optic"] == 1:
-            return "Fiber optic customers generally have higher churn."
+        elif row["InternetService"] == "Fiber optic":
+            return "Customer uses Fiber optic internet."
 
-        elif row["OnlineSecurity_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No":
             return "Customer has not subscribed to Online Security."
 
-        elif row["TechSupport_Yes"] == 0:
+        elif row["TechSupport"] == "No":
             return "Customer has not subscribed to Technical Support."
 
-        elif row["OnlineBackup_Yes"] == 0:
+        elif row["OnlineBackup"] == "No":
             return "Customer has not subscribed to Online Backup."
 
-        elif row["PaymentMethod_Electronic check"] == 1:
-            return "Electronic Check payment is associated with higher churn."
+        elif row["PaymentMethod"] == "Electronic check":
+            return "Customer uses Electronic Check payment."
 
         elif row["SeniorCitizen"] == 1:
-            return "Customer is a senior citizen and eligible for special offers."
+            return "Customer is a senior citizen and may benefit from targeted offers."
 
         else:
-            return "High-priority customer identified by the churn model."
+            return "Customer has been identified as a high-priority retention case."
 
-    # ===========================
-    # MEDIUM PRIORITY
-    # ===========================
+    # =========================
+    # MEDIUM
+    # =========================
 
     elif priority == "Medium":
 
@@ -300,49 +304,51 @@ def recommendation_reason(row):
             return "Customer is relatively new."
 
         elif monthly >= 90:
-            return "Customer pays above-average monthly charges."
+            return "Customer has relatively high monthly charges."
 
-        elif row["Contract_One year"] == 0 and row["Contract_Two year"] == 0:
+        elif row["Contract"] == "Month-to-month":
             return "Customer is using a month-to-month contract."
 
-        elif row["OnlineSecurity_Yes"] == 0:
+        elif row["OnlineSecurity"] == "No":
             return "Customer is not using Online Security."
 
-        elif row["TechSupport_Yes"] == 0:
+        elif row["TechSupport"] == "No":
             return "Customer is not using Technical Support."
 
-        elif row["OnlineBackup_Yes"] == 0:
+        elif row["OnlineBackup"] == "No":
             return "Customer is not using Online Backup."
 
-        elif row["PaymentMethod_Electronic check"] == 1:
-            return "Electronic Check payment method has moderate churn risk."
+        elif row["PaymentMethod"] == "Electronic check":
+            return "Customer uses Electronic Check payment."
 
         elif row["SeniorCitizen"] == 1:
-            return "Customer qualifies for senior citizen benefits."
+            return "Customer may benefit from senior-focused offers."
 
         else:
             return "Customer has moderate churn risk."
 
-    # ===========================
-    # LOW PRIORITY
-    # ===========================
+    # =========================
+    # LOW
+    # =========================
 
     else:
 
         if clv >= 5000:
-            return "Customer is highly valuable and already loyal."
+            return "Customer is highly valuable and currently has low churn priority."
 
         elif tenure >= 60:
             return "Customer has been with the company for a long time."
 
-        elif row["Contract_Two year"] == 1:
-            return "Long-term contract significantly reduces churn."
+        elif row["Contract"] == "Two year":
+            return "Customer has a long-term contract, which generally indicates stronger retention."
 
-        elif row["InternetService_Fiber optic"] == 1:
-            return "Customer uses Fiber Internet but currently has low churn risk."
+        elif row["InternetService"] == "Fiber optic":
+            return "Customer uses Fiber internet but currently has low churn priority."
 
-        elif row["PaymentMethod_Credit card (automatic)"] == 1:
-            return "Automatic payment indicates stable customer behaviour."
+        elif row["PaymentMethod"] == "Credit card (automatic)":
+            return (
+                "Customer uses automatic payment and currently has low churn priority."
+            )
 
         else:
             return "Customer currently has low churn risk."
