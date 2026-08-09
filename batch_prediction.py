@@ -41,6 +41,11 @@ def batch_prediction_page(model):
         df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
 
         # --------------------------------
+        # Keep Original Data
+        # --------------------------------
+
+        original_df = df.copy()
+        # --------------------------------
         # Prepare data for model
         # --------------------------------
 
@@ -59,11 +64,6 @@ def batch_prediction_page(model):
 
         probability = model.predict_proba(X)[:, 1]
 
-        # --------------------------------
-        # Keep Original Data
-        # --------------------------------
-
-        original_df = df.copy()
         # --------------------------------
         # Add prediction results
         # --------------------------------
@@ -89,9 +89,12 @@ def batch_prediction_page(model):
         # --------------------------------
         # Priority Score
         # --------------------------------
+        max_clv = original_df["CLV"].max()
 
         original_df["Priority_Score"] = original_df.apply(
-            lambda row: calculate_priority_score(row["CLV"], row["Churn_Probability"]),
+            lambda row: calculate_priority_score(
+                row["CLV"], row["Churn_Probability"], max_clv
+            ),
             axis=1,
         )
 

@@ -41,8 +41,6 @@ def shap_page(model):
 
     y = df["Churn"]
 
-    # Convert Yes/No to 0/1
-
     # -----------------------------
     # 3. Train Test Split
     # -----------------------------
