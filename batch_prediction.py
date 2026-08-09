@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 from utils import (
-    calculate_clv,
-    calculate_revenue_at_risk,
     calculate_priority_score,
     priority_level,
     smart_retention,
@@ -22,7 +21,7 @@ def batch_prediction_page(model):
     if uploaded_file is not None:
 
         # --------------------------------
-        # Load Data
+        # 1. Load data
         # --------------------------------
 
         df = pd.read_csv(uploaded_file)
@@ -31,36 +30,52 @@ def batch_prediction_page(model):
         st.dataframe(df.head(), use_container_width=True)
 
         # --------------------------------
-        # Feature Engineering
+        # 2. Convert numeric columns
         # --------------------------------
 
-        df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+        numeric_columns = ["SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges"]
+
+        for col in numeric_columns:
+
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        # --------------------------------
+        # 3. Feature Engineering
+        # --------------------------------
 
         df["AverageMonthlySpend"] = df["TotalCharges"] / (df["tenure"] + 1)
 
-        if "Churn" in df.columns:
-            df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
+        # --------------------------------
+        # 4. Remove infinite values
+        # --------------------------------
+
+        df = df.replace([np.inf, -np.inf], np.nan)
 
         # --------------------------------
-        # Keep Original Data
+        # 5. Keep original data
         # --------------------------------
 
         original_df = df.copy()
+
         # --------------------------------
-        # Prepare data for model
+        # 6. Prepare model input
         # --------------------------------
 
         X = df.drop(columns=["customerID", "Churn"], errors="ignore")
 
-        # IMPORTANT:
-        # No pd.get_dummies()
-        # No manual scaling
-        # ColumnTransformer Pipeline handles it.
-        # Automatically align columns with the model's trained features
-        if hasattr(model, "feature_names_in_"):
-            X = X.reindex(columns=model.feature_names_in_, fill_value=0)
         # --------------------------------
-        # Prediction
+        # 7. Make sure columns match model
+        # --------------------------------
+
+        if hasattr(model, "feature_names_in_"):
+
+            expected_columns = model.feature_names_in_
+
+            X = X.reindex(columns=expected_columns)
+
+        # --------------------------------
+        # 8. Prediction
         # --------------------------------
 
         prediction = model.predict(X)
@@ -68,7 +83,7 @@ def batch_prediction_page(model):
         probability = model.predict_proba(X)[:, 1]
 
         # --------------------------------
-        # Add prediction results
+        # 9. Add prediction
         # --------------------------------
 
         original_df["predicted_churn"] = prediction
@@ -76,13 +91,13 @@ def batch_prediction_page(model):
         original_df["Churn_Probability"] = probability
 
         # --------------------------------
-        # CLV
+        # 10. CLV
         # --------------------------------
 
         original_df["CLV"] = original_df["MonthlyCharges"] * original_df["tenure"]
 
         # --------------------------------
-        # Revenue At Risk
+        # 11. Revenue At Risk
         # --------------------------------
 
         original_df["Revenue_At_Risk"] = (
@@ -90,8 +105,9 @@ def batch_prediction_page(model):
         )
 
         # --------------------------------
-        # Priority Score
+        # 12. Priority Score
         # --------------------------------
+
         max_clv = original_df["CLV"].max()
 
         original_df["Priority_Score"] = original_df.apply(
@@ -102,7 +118,7 @@ def batch_prediction_page(model):
         )
 
         # --------------------------------
-        # Priority Level
+        # 13. Priority Level
         # --------------------------------
 
         original_df["Priority_Level"] = original_df["Priority_Score"].apply(
@@ -110,13 +126,13 @@ def batch_prediction_page(model):
         )
 
         # --------------------------------
-        # Retention Recommendation
+        # 14. Retention Action
         # --------------------------------
 
         original_df["Retention_Action"] = original_df.apply(smart_retention, axis=1)
 
         # --------------------------------
-        # Recommendation Reason
+        # 15. Recommendation Reason
         # --------------------------------
 
         original_df["Recommendation_Reason"] = original_df.apply(
@@ -124,7 +140,7 @@ def batch_prediction_page(model):
         )
 
         # --------------------------------
-        # Results
+        # 16. Results
         # --------------------------------
 
         st.success("Prediction Completed Successfully")
@@ -134,7 +150,7 @@ def batch_prediction_page(model):
         st.dataframe(original_df, use_container_width=True)
 
         # --------------------------------
-        # Download
+        # 17. Download
         # --------------------------------
 
         csv = original_df.to_csv(index=False).encode("utf-8")
