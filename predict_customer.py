@@ -231,7 +231,6 @@ def predict_customer_page(model):
         else:
             st.success("✅ Customer Will Stay")
 
-        # Replace vertical st.metric calls with columns
         col1, col2, col3 = st.columns(3)
 
         with col1:
