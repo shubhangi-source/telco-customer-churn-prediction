@@ -42,8 +42,6 @@ def shap_page(model):
     y = df["Churn"]
 
     # Convert Yes/No to 0/1
-    if y.dtype == "object":
-        y = y.map({"No": 0, "Yes": 1})
 
     # -----------------------------
     # 3. Train Test Split
