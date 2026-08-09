@@ -38,7 +38,8 @@ def batch_prediction_page(model):
 
         df["AverageMonthlySpend"] = df["TotalCharges"] / (df["tenure"] + 1)
 
-        df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
+        if "Churn" in df.columns:
+            df["Churn"] = df["Churn"].map({"No": 0, "Yes": 1})
 
         # --------------------------------
         # Keep Original Data
@@ -55,7 +56,9 @@ def batch_prediction_page(model):
         # No pd.get_dummies()
         # No manual scaling
         # ColumnTransformer Pipeline handles it.
-
+        # Automatically align columns with the model's trained features
+        if hasattr(model, "feature_names_in_"):
+            X = X.reindex(columns=model.feature_names_in_, fill_value=0)
         # --------------------------------
         # Prediction
         # --------------------------------
