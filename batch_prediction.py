@@ -43,6 +43,8 @@ def batch_prediction_page(model):
         df = pd.get_dummies(df, drop_first=True, dtype=int)
 
         X = df.drop(columns=["Churn"], errors="ignore")
+
+        X.fillna(X.median(), inplace=True)
         # -----------------------------
         # Prediction
         # -----------------------------
