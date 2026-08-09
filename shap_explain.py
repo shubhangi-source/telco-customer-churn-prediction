@@ -15,7 +15,7 @@ def shap_page(model):
     # 1. Load Data
     # -----------------------------
 
-    df = pd.read_csv("data/revenue_loss_estimator.csv")
+    df = pd.read_csv("data/processed_telco_churn.csv")
 
     # -----------------------------
     # 2. Remove extra columns
