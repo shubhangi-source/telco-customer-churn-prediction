@@ -113,7 +113,8 @@ def predict_customer_page(model):
                 }
             ]
         )
-
+        if hasattr(model, "feature_names_in_"):
+            customer = customer.reindex(columns=model.feature_names_in_, fill_value=0)
         prediction = model.predict(customer)[0]
 
         probability = model.predict_proba(customer)[0, 1]
