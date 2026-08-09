@@ -15,32 +15,32 @@ def shap_page(model):
     df = pd.read_csv("data/processed_telco_churn.csv")
 
     # 2. Separate Features (X) and Target (y)
-    X = df.drop(columns=["Churn"], errors="ignore")
+    X = df.drop(columns=["Churn", "customerID"], errors="ignore")
     y = df["Churn"]
 
-    # 3. Train-Test Split
+    # 3. Align columns to match the exact features the model was trained on
+    if hasattr(model, "feature_names_in_"):
+        X = X.reindex(columns=model.feature_names_in_, fill_value=0)
+
+    # Clean up any NaN or infinite values
+    X = X.fillna(0)
+
+    # 4. Train-Test Split
     X_train, X_test, _, _ = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    # 4. Extract Final Classifier and Preprocessing Steps
-    # model.steps[-1][1] grabs the final model (e.g., Logistic Regression)
-    classifier = model.steps[-1][1]
+    # 5. Extract the underlying classifier model (last step of pipeline)
+    if hasattr(model, "steps"):
+        classifier = model.steps[-1][1]
+    else:
+        classifier = model
 
-    # Transform raw features using pipeline transformers (skipping SMOTE)
-    X_train_prep = X_train.copy()
-    X_test_prep = X_test.copy()
-
-    for name, step in model.steps[:-1]:
-        if "smote" not in name.lower() and hasattr(step, "transform"):
-            X_train_prep = step.transform(X_train_prep)
-            X_test_prep = step.transform(X_test_prep)
+    # 6. Initialize SHAP Explainer directly on numerical features
+    explainer = shap.LinearExplainer(classifier, X_train)
+    shap_vals = explainer.shap_values(X_test)
 
     feature_names = list(X.columns)
-
-    # 5. Initialize SHAP Explainer
-    explainer = shap.LinearExplainer(classifier, X_train_prep)
-    shap_vals = explainer.shap_values(X_test_prep)
 
     # --------------------------------
     # Global Feature Importance Plot
@@ -48,7 +48,7 @@ def shap_page(model):
     st.subheader("📊 Global Feature Importance")
 
     fig1, ax1 = plt.subplots(figsize=(8, 4))
-    shap.summary_plot(shap_vals, X_test_prep, feature_names=feature_names, show=False)
+    shap.summary_plot(shap_vals, X_test, feature_names=feature_names, show=False)
     st.pyplot(fig1, clear_figure=True)
 
     # --------------------------------
@@ -59,12 +59,12 @@ def shap_page(model):
     customer_idx = st.number_input(
         "Select Customer Row Index",
         min_value=0,
-        max_value=len(X_test_prep) - 1,
+        max_value=len(X_test) - 1,
         value=0,
         step=1,
     )
 
-    # Prepare single customer SHAP explanation object
+    # Extract base value and SHAP values for selected index safely
     base_value = (
         explainer.expected_value[1]
         if isinstance(explainer.expected_value, (list, np.ndarray))
@@ -80,11 +80,7 @@ def shap_page(model):
     exp = shap.Explanation(
         values=val_row,
         base_values=base_value,
-        data=(
-            X_test_prep[customer_idx]
-            if isinstance(X_test_prep, np.ndarray)
-            else X_test_prep.iloc[customer_idx]
-        ),
+        data=X_test.iloc[customer_idx].values,
         feature_names=feature_names,
     )
 
