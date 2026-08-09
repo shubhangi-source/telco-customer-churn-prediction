@@ -36,7 +36,6 @@ def batch_prediction_page(model):
         numeric_columns = ["SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges"]
 
         for col in numeric_columns:
-
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -65,14 +64,16 @@ def batch_prediction_page(model):
         X = df.drop(columns=["customerID", "Churn"], errors="ignore")
 
         # --------------------------------
-        # 7. Make sure columns match model
+        # 7. Make sure columns match model & handle missing values
         # --------------------------------
 
         if hasattr(model, "feature_names_in_"):
-
             expected_columns = model.feature_names_in_
+            # reindex with fill_value=0 so new/missing columns get 0 instead of NaN
+            X = X.reindex(columns=expected_columns, fill_value=0)
 
-            X = X.reindex(columns=expected_columns)
+        # Fill any remaining NaNs in numeric/categorical features
+        X = X.fillna(0)
 
         # --------------------------------
         # 8. Prediction
