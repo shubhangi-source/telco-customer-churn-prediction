@@ -63,7 +63,9 @@ def shap_page(best_lr):
 
     fig = plt.figure(figsize=(8, 4))
 
-    shap.summary_plot(shap_values, X_test, feature_names=X_test.columns, show=False)
+    shap.summary_plot(
+        shap_values, X_test_scaled, feature_names=X_test.columns, show=False
+    )
 
     st.pyplot(fig)
 
@@ -80,8 +82,10 @@ def shap_page(best_lr):
     st.subheader("Explain Individual Customer")
 
     customer_index = st.number_input(
-        "Customer Index", min_value=0, max_value=len(X) - 1, value=0
+        "Customer Index", min_value=0, max_value=len(X_test_scaled) - 1, value=0
     )
+
+    customer_index = int(customer_index)
 
     fig = plt.figure(figsize=(8, 4))
 
@@ -89,8 +93,8 @@ def shap_page(best_lr):
         shap.Explanation(
             values=shap_values[customer_index],
             base_values=explainer.expected_value,
-            data=X_test.iloc[customer_index],
-            feature_names=X.columns,
+            data=X_test_scaled.iloc[customer_index],
+            feature_names=X_test.columns,
         ),
         show=False,
     )
