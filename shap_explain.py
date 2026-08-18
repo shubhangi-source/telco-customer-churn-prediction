@@ -95,8 +95,8 @@ def shap_page(model):
     shap.summary_plot(
         shap_values, X_test_processed, feature_names=feature_names, show=False
     )
-    st.pyplot(fig1, clear_figure=True)
-    plt.close(fig1)
+    st.pyplot(fig1, clear_figure=True)#Display this figure and then clear its contents."
+    plt.close(fig1) #"Close this figure and release its memory."
 
     # 5. Individual customer explanation
     st.subheader("🔍 Individual Customer Explanation")
@@ -116,10 +116,10 @@ def shap_page(model):
     st.write("### Why did the model make this prediction?")
     try:
         row = X_test_processed[customer_idx]
-        row_dense = row.toarray().flatten() if hasattr(row, "toarray") else row
+        row_dense = row.toarray().flatten() if hasattr(row, "toarray") else row#row is a sparse matrix, convert it to a normal array; otherwise, keep it as it is."
 
         expected_value = explainer.expected_value
-        if hasattr(expected_value, "__len__"):
+        if hasattr(expected_value, "__len__"):#checks whether expected_value contains multiple values, such as an array/list.
             expected_value = expected_value[0]
 
         fig3 = plt.figure(figsize=(10, 6))
@@ -137,7 +137,6 @@ def shap_page(model):
     except Exception as e:
         st.error(f"Could not create individual SHAP explanation: {e}")
 
-    # 6. Explanation text
     st.subheader("💡 How to Interpret SHAP")
     st.markdown("""
         - 🔴 **Positive SHAP value** → pushes prediction toward higher churn probability.

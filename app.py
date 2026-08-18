@@ -138,13 +138,13 @@ This application predicts customer churn using a Machine Learning model
 and provides business insights to help companies reduce customer attrition.
 
 ### Machine Learning 
-   - Logistic Regression
-   - ColumnTransformer 
-  - OneHotEncoder
-  - RobustScaler
- - SMOTE
-  - Stratified Cross-Validation 
- - GridSearchCV
+- Logistic Regression
+- ColumnTransformer 
+- OneHotEncoder
+- RobustScaler
+- SMOTE
+- Stratified Cross-Validation 
+- GridSearchCV
 
 
 ###  Business Features

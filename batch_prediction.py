@@ -154,7 +154,7 @@ def batch_prediction_page(model):
         # 17. Download
         # --------------------------------
 
-        csv = original_df.to_csv(index=False).encode("utf-8")
+        csv = original_df.to_csv(index=False).encode("utf-8") #Converts the CSV text into bytes using UTF-8 encoding.Streamlit's download button can use these bytes as the downloadable file data.
 
         st.download_button(
             label="⬇ Download Prediction Results",

@@ -127,7 +127,6 @@ def predict_customer_page(model):
 
         level_name = priority_level(priority)
 
-        # Create one-hot-like fields only for the # business-rule functions in utils.py. # # These are NOT sent to the ML model.
         business_data = {
             "Contract": contract,
             "OnlineSecurity": online_security,
@@ -147,10 +146,6 @@ def predict_customer_page(model):
 
         reason = recommendation_reason(business_data)
 
-        retention_action = smart_retention(business_data)
-
-        reason = recommendation_reason(business_data)
-
         st.success("Prediction Completed")
 
         if prediction == 1:
@@ -158,7 +153,7 @@ def predict_customer_page(model):
         else:
             st.success("✅ Customer Will Stay")
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
 
         with col1:
             st.metric("Churn Probability", f"{probability:.2%}")
